@@ -1,17 +1,19 @@
 const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
 
+const adminRouter = require('./routes/admin');
+const shopRouter = require('./routes/shop');
+const rootDir = require('./util/path');
 const app = express();
 
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(express.static(path.join(rootDir, 'public')));
+
+app.use('/admin', adminRouter)
+app.use(shopRouter)
 app.use((req, res, next) => {
-    console.log('In the middle ware!');
-    next(); // Allow to request continue the next middleware in line
-})
-app.use((req, res, next) => {
-    console.log('In the next middle ware!');
-    // we send the rsponse here
-    res.send('<h1>Hello Welcome to the express js !</h1>');
-    // express js middleware executed top to bottom
-    // if we not call the next() then next middle ware not executed
-    //  default res header type is html
+    // res.status(404).send('<h1>Page not found</h1>')
+    res.status(404).sendFile(path.join(rootDir, 'views', '404.html'));
 })
 app.listen(3000)
